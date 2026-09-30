@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">FocusLock</string>
+    <string name="accessibility_description">Detects when a selected app is opened during a focus lock so FocusLock can display its lock screen. It does not read screen contents.</string>
+</resources>
