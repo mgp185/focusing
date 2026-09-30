@@ -42,21 +42,22 @@ public class MainActivity extends Activity {
   ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);body=column();body.setPadding(dp(24),dp(8),dp(24),dp(24));scroll.addView(body);shell.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
   timerText=null;modeText=null;ring=null;appCount=null;
   if(page==0)home();else if(page==1)apps();else settings();
+  if(page==0){LinearLayout action=column();action.setPadding(dp(24),dp(8),dp(24),dp(8));boolean active=LockPrefs.active(this);action.addView(button(active?(LockPrefs.strict(this)?"엄격 모드 · 종료까지 유지":"이번 집중 종료"):"집중 시작",active?this::stop:this::start,!active||!LockPrefs.strict(this)));shell.addView(action);}
   nav=new LinearLayout(this);nav.setPadding(dp(16),dp(12),dp(16),dp(12));String[] names={"집중","차단 앱","설정"};for(int n=0;n<3;n++){final int tab=n;Button b=button(names[n],()->{page=tab;draw();},false);b.setTextColor(n==page?accent:muted);nav.addView(b,new LinearLayout.LayoutParams(0,dp(52),1));}shell.addView(nav);refresh();
  }
  private boolean enabled(){String s=Settings.Secure.getString(getContentResolver(),Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);String own=new ComponentName(this,AppWatchService.class).flattenToString();if(s!=null)for(String v:s.split(":"))if(own.equalsIgnoreCase(v))return true;return false;}
  private void home(){
   boolean active=LockPrefs.active(this);label(active?"지금, 집중하는 시간":"집중할 준비 됐나요?",active?"선택한 앱을 잠시 멀리 두세요.":"방해는 줄이고, 하고 싶은 일에 가까이.");
   LinearLayout hero=panel();hero.setGravity(Gravity.CENTER_HORIZONTAL);
-  modeText=text("",12,accent,true);add(hero,modeText,0);ring=new Ring(this);LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(dp(228),dp(228));rp.topMargin=dp(18);hero.addView(ring,rp);
+  modeText=text("",12,accent,true);add(hero,modeText,0);ring=new Ring(this);int ringSize=Math.min(204,(int)(getResources().getDisplayMetrics().heightPixels/getResources().getDisplayMetrics().density*.22f));LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(dp(ringSize),dp(ringSize));rp.topMargin=dp(18);hero.addView(ring,rp);
   timerText=text("",36,ink,true);timerText.setGravity(Gravity.CENTER);add(hero,timerText,8);add(hero,text(active?"남은 집중 시간":"이번 집중 시간",13,muted,false),6);
   appCount=text("",14,muted,false);add(hero,appCount,20);add(body,hero,24);
   if(!enabled()){add(body,button("접근성을 켜고 차단 준비하기",this::permission,false),16);add(body,text("접근성 권한이 꺼져 있어 앱 차단이 작동하지 않아요.",12,muted,false),8);}
   if(!active){
    add(body,text("집중 시간",17,ink,true),24);LinearLayout row=new LinearLayout(this);int[] times={1,25,50,90};for(int m:times){Button b=button(m+"분",()->chooseDuration(m),duration==m*60000L);LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(50),1);p.setMargins(dp(2),0,dp(2),0);row.addView(b,p);}add(body,row,12);add(body,button("직접 설정 · 최대 24시간",this::customDuration,false),8);
    LinearLayout strictPanel=panel();Switch sw=new Switch(this);sw.setText("엄격 모드");sw.setTextColor(ink);sw.setTextSize(17);sw.setChecked(strict);sw.setOnCheckedChangeListener((v,on)->{strict=on;prefs().edit().putBoolean("draft_strict",on).apply();});add(strictPanel,sw,0);add(strictPanel,text("켜면 종료 전 앱 내부에서 해제하거나 설정을 바꿀 수 없어요.",13,muted,false),10);add(body,strictPanel,18);
-   add(body,button("집중 시작",this::start,true),20);
-  }else{add(body,button(LockPrefs.strict(this)?"엄격 모드 · 종료까지 유지":"이번 집중 종료",this::stop,!LockPrefs.strict(this)),20);add(body,text("홈 화면과 선택하지 않은 앱은 계속 사용할 수 있어요.",13,muted,false),12);}
+
+  }else{add(body,text("홈 화면과 선택하지 않은 앱은 계속 사용할 수 있어요.",13,muted,false),12);}
  }
  private void chooseDuration(int m){if(LockPrefs.active(this))return;duration=m*60000L;prefs().edit().putLong("draft_duration",duration).apply();draw();}
  private void customDuration(){EditText input=new EditText(this);input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);input.setHint("분 단위 · 1~1440");new AlertDialog.Builder(this).setTitle("얼마나 집중할까요?").setView(input).setNegativeButton("취소",null).setPositiveButton("설정",(d,w)->{try{int n=Integer.parseInt(input.getText().toString());if(n<1||n>1440){toast("1~1440분을 입력하세요");return;}chooseDuration(n);}catch(NumberFormatException e){toast("숫자로 시간을 입력하세요");}}).show();}
