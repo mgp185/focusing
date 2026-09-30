@@ -36,6 +36,7 @@ public class MainActivity extends Activity {
   bg=Color.parseColor(dark?"#0D1423":"#F4F7FA");card=Color.parseColor(dark?"#182235":"#FFFFFF");ink=Color.parseColor(dark?"#F1F5FC":"#182235");muted=Color.parseColor(dark?"#9CAFC7":"#53657E");accent=Color.parseColor(dark?"#75E5C2":"#44C7A3");
   getWindow().setStatusBarColor(bg);getWindow().setNavigationBarColor(bg);getWindow().getDecorView().setSystemUiVisibility(dark?0:View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR|View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
   shell=column();shell.setBackgroundColor(bg);setContentView(shell);
+  shell.post(()->{if(Build.VERSION.SDK_INT>=30){WindowInsetsController c=getWindow().getInsetsController();if(c!=null){int mask=WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS|WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;c.setSystemBarsAppearance(dark?0:mask,mask);}}});
   shell.setOnApplyWindowInsetsListener((v,i)->{v.setPadding(0,i.getSystemWindowInsetTop(),0,i.getSystemWindowInsetBottom());return i;});
   LinearLayout header=new LinearLayout(this);header.setGravity(Gravity.CENTER_VERTICAL);header.setPadding(dp(24),dp(16),dp(24),dp(8));
   TextView logo=text("◉  FocusLock",20,ink,true);header.addView(logo,new LinearLayout.LayoutParams(0,-2,1));TextView tag=text("LOCAL ONLY",10,accent,true);header.addView(tag);shell.addView(header);
