@@ -6,11 +6,12 @@ import android.view.*;
 import android.widget.*;
 import java.util.*;
 public class FlowTests extends Instrumentation {
- private int passed=0;
+ private int passed=0; private String mode="";
  private void check(boolean v,String name){if(!v)throw new AssertionError(name);passed++;}
- @Override public void onCreate(Bundle b){super.onCreate(b);start();}
+ @Override public void onCreate(Bundle b){super.onCreate(b);mode=b==null?"":b.getString("mode","");start();}
  @Override public void onStart(){Bundle result=new Bundle();try{
   Context c=getTargetContext();c.getSharedPreferences(LockPrefs.PREFS,0).edit().clear().commit();
+  if(mode.equals("block")){LockPrefs.start(c,new HashSet<>(Arrays.asList("com.example.focusfixture")),30000,true);result.putString("stream","BLOCK_SETUP\n");finish(Activity.RESULT_OK,result);return;}
   check(!LockPrefs.active(c),"initial unlocked");
   LockPrefs.start(c,new HashSet<>(),60000,true);check(!LockPrefs.active(c),"empty selection rejected");
   Set<String> apps=new HashSet<>();apps.add("com.android.chrome");

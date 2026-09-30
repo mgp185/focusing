@@ -6,6 +6,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     permissions:
       contents: read
     steps:
@@ -22,7 +23,7 @@ jobs:
         with:
           gradle-version: '8.7'
       - run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
-      - run: gradle assembleDebug testDebugUnitTest lintDebug --no-daemon
+      - run: gradle assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
           name: FocusLock-2.0-debug
@@ -30,3 +31,18 @@ jobs:
             app/build/outputs/apk/debug/app-debug.apk
             app/build/reports/tests/testDebugUnitTest/
             app/build/reports/lint-results-debug.html
+      - name: Enable KVM for emulator tests
+        run: |
+          sudo chmod 666 /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          script: bash ci/smoke-test.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: FocusLock-device-checks
+          path: smoke-output/
