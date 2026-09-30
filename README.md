@@ -1,12 +1,25 @@
-# FocusLock 2.0 디자인·기능 개편 소스
+# FocusLock 2.0
 
-네이비·민트 UI, 집중/차단 앱/설정 화면, 원형 진행 표시, 앱 아이콘·검색·선택 저장, 1·25·50·90분 및 최대 24시간 직접 설정, 일반/엄격 모드, 다크·라이트 테마, 앱 아이콘과 차단 오버레이를 구현했습니다. 인터넷·광고·분석 SDK와 새 권한은 추가하지 않았습니다.
+Personal Android app lock with a Korean interface, navy/mint styling, focus/apps/settings screens, a session progress ring, searchable app selection, persisted selections, 1/25/50/90-minute presets, custom 1–1440-minute sessions and light/dark themes. Session actions stay visible on small screens.
 
-## 현재 상태
-새 APK는 아직 빌드되지 않았습니다. 현재 환경에 SDK/Gradle이 없고 해당 다운로드 연결이 실패했습니다. 세션 규칙 9개 검사와 Java 6개/XML 6개 구문 검사는 통과했습니다. Android 타입 검사, UI 실행과 실기기 검증은 미완료입니다. 디자인 미리보기는 실제 앱 캡처가 아닙니다. 앱은 한국어입니다. 기존 1.1 APK는 변경되지 않았습니다.
+Normal sessions can be ended early after confirmation. Strict sessions reject early stop and reconfiguration until expiry. Accessibility detects package names and shows a timed accessibility overlay. No internet permission, analytics SDK, ads or screen-content retrieval.
 
-## 빌드
-JDK 17, SDK35, Gradle8.7, AGP8.6.1. Android Studio로 프로젝트를 열어 SDK 동기화 후 ./gradlew assembleDebug testDebugUnitTest lintDebug 실행. 기존 1.1 서명키가 보존되지 않아 새 키로 빌드한 APK는 기존 앱 위 업데이트가 거절될 수 있습니다. 기존 앱 삭제는 설정을 지웁니다.
+## Build and verification
 
-## 한계
-앱 내부 조기 종료·설정 변경을 막지만 시스템 권한 해제·삭제·강제 종료·안전 모드·재부팅 후 시계 변경 우회는 막지 않습니다. 일일 사용량·예약·집중 통계는 구현하지 않았습니다.
+JDK 17, Gradle 8.7, AGP 8.6.1, Android SDK 35. Run `gradle assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug`.
+
+GitHub Actions builds the APK, runs nine unit tests and Android lint, then installs it on an API 35 emulator. The smoke script runs 11 instrumentation checks and verifies that an accessibility overlay appears for a separate test app and disappears after expiry. It captures actual screens and diagnostics. See [latest validation run](https://github.com/mgp185/focusing/actions/runs/36738796170). Physical Galaxy-device testing remains necessary.
+
+APK and reports are available as Actions artifacts. The `smoke` module and instrumentation APK are test tools; install only the main app APK for personal use.
+
+## Install
+
+The debug signing key differs from the previous 1.1 build: uninstall the old app, then install the new APK. Settings are cleared on uninstall. CI debug keys are ephemeral, so future debug builds may also require reinstalling.
+
+Grant FocusLock Accessibility access. If restricted, open Settings > Apps > FocusLock app info > More > Allow restricted settings, then enable the installed accessibility service. Menu labels vary by OS/OEM. Start with one selected app and a one-minute ordinary session, then a one-minute strict session.
+
+## Limits
+
+Strict mode restricts in-app changes. It does not prevent system permission revocation, uninstall, force-stop, safe mode or reboot followed by clock changes. Multi-window, PiP, notification paths and OEM power management require device checks. Background playback is not stopped. Daily usage quotas, recurring schedules and focus statistics are not implemented.
+
+This is a personal test build, not a Play Store release.
