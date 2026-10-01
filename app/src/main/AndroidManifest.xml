@@ -9,7 +9,7 @@
 
         <activity android:name=".ScheduleActivity" android:exported="false"/>
         <service android:name=".CalmMusicService" android:exported="false" android:foregroundServiceType="mediaPlayback"/>
-        <activity android:name=".MainActivity" android:exported="true">
+        <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTask">
             <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
         </activity>
         <service android:name=".AppWatchService" android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" android:exported="true" android:label="FocusLock app blocking">

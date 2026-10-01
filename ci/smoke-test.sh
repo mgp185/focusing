@@ -34,7 +34,7 @@ adb exec-out screencap -p > smoke-output/expired.png
 python3 -c "from pathlib import Path; assert 'ACCESSIBILITY_OVERLAY' not in Path('smoke-output/expired-windows.txt').read_text()"
 echo 'PASS: real accessibility overlay appeared and expired' | tee smoke-output/overlay-result.txt
 
-adb shell am instrument -w -e mode live com.example.focuslock.test/com.example.focuslock.FlowTests | tee smoke-output/live-tests.txt
+timeout 240s adb shell am instrument -w -e mode live com.example.focuslock.test/com.example.focuslock.FlowTests | tee smoke-output/live-tests.txt
 for image in focus-ready focus-running focus-blocked quit-confirmation focus-expired scheduled-blocked schedules schedule-editor schedule-saved shop; do
   adb exec-out run-as com.example.focuslock cat files/$image.png > smoke-output/$image.png || true
 done
