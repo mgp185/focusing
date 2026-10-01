@@ -15,7 +15,7 @@ public class AppWatchService extends AccessibilityService {
  private final Runnable tick=new Runnable(){public void run(){
   long wall=System.currentTimeMillis(),elapsed=SystemClock.elapsedRealtime(),dt=elapsed-lastElapsed;
   // Credit the union of schedule windows only while this service is actually connected.
-  if(dt>0&&lastWall>0&&Math.abs((wall-lastWall)-dt)<2000&&dt<120000){FocusState.creditAutomatic(AppWatchService.this,WeeklySchedule.covered(previous,lastWall,wall,TimeZone.getDefault()));}
+  if(dt>0&&lastWall>0&&Math.abs((wall-lastWall)-dt)<2000){FocusState.creditAutomatic(AppWatchService.this,WeeklySchedule.covered(previous,lastWall,wall,TimeZone.getDefault()));}
   lastWall=wall;lastElapsed=elapsed;previous=FocusState.schedules(AppWatchService.this);FocusState.settle(AppWatchService.this);
   if(!FocusState.focusActive(AppWatchService.this))stopService(new Intent(AppWatchService.this,CalmMusicService.class));
   update();handler.postDelayed(this,1000);
