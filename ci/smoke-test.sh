@@ -31,8 +31,12 @@ python3 -c "from pathlib import Path; assert 'ACCESSIBILITY_OVERLAY' not in Path
 echo 'PASS: real accessibility overlay appeared and expired' | tee smoke-output/overlay-result.txt
 
 adb shell am instrument -w -e mode live com.example.focuslock.test/com.example.focuslock.FlowTests | tee smoke-output/live-tests.txt
-python3 -c "from pathlib import Path; assert 'PASS LIVE' in Path('smoke-output/live-tests.txt').read_text()"
 for image in focus-ready focus-running focus-blocked quit-confirmation focus-expired scheduled-blocked schedules schedule-editor schedule-saved shop; do
-  adb exec-out run-as com.example.focuslock cat files/$image.png > smoke-output/$image.png
+  adb exec-out run-as com.example.focuslock cat files/$image.png > smoke-output/$image.png || true
 done
 adb logcat -d -s AndroidRuntime > smoke-output/final-runtime-log.txt
+
+for diagnostic in live-accessibility live-activity live-logcat; do
+  adb exec-out run-as com.example.focuslock cat files/$diagnostic.txt > smoke-output/$diagnostic.txt || true
+done
+python3 -c "from pathlib import Path; assert 'PASS LIVE' in Path('smoke-output/live-tests.txt').read_text()"

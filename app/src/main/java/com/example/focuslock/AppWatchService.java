@@ -8,7 +8,7 @@ import android.view.accessibility.AccessibilityEvent;
 import android.widget.*;
 import java.util.*;
 public class AppWatchService extends AccessibilityService {
- static boolean connected;
+ static volatile boolean connected;
  private LinearLayout overlay;private TextView countdown;private boolean focusOverlay,confirming;private String foreground="";
  private long lastWall,lastElapsed;private List<WeeklySchedule> previous=new ArrayList<>();private final Set<String> calls=new HashSet<>();
  private final Handler handler=new Handler(Looper.getMainLooper());
