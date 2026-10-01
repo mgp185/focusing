@@ -1,25 +1,23 @@
-# FocusLock 2.0
+# FocusLock 3.0
+Personal Android app lock. Korean navy/mint UI, ordinary/strict immediate app lock, multiple weekly schedules with per-schedule targets and ordinary/strict modes, overnight windows, focus mode, virtual coins and an empty shop. Original offline synthesized piano, ambient and rain loops include selection, toggle and volume controls.
 
-Personal Android app lock with a Korean interface, navy/mint styling, focus/apps/settings screens, a session progress ring, searchable app selection, persisted selections, 1/25/50/90-minute presets, custom 1–1440-minute sessions and light/dark themes. Session actions stay visible on small screens.
+## Semantics
+- Day selections identify the START day. 23:00–07:00 continues into the next day. Device local timezone applies. Equal start/end is rejected.
+- Running strict schedules cannot be edited, disabled or deleted. Outside their active windows they are editable.
+- Connected accessibility-service time inside the union of enabled scheduled windows yields 1 coin/hour, maximum regardless of overlapping targets/schedules. No retroactive offline rewards or immediate-lock rewards. Pauses caused by service death or large clock changes are not credited.
+- Focus mode blocks other apps and the launcher via accessibility overlays. FocusLock, SystemUI, the default dialer and telecom packages remain available; emergency/ringing calls are intentionally allowed. Full system lock and uninstall prevention are not possible with ordinary permissions.
+- Focus completion earns 10 coins/hour in whole-coin units, with fractional completed time carried forward. Abandonment earns zero for that session. Schedules and focus rewards add independently (11/hour together).
+- The quit dialog rotates encouragement text and offers explicit continue/quit options. Permission/service interruptions or reboot cancel the focus reward.
+- Coins are local virtual balances with no monetary value, cloud sync or purchase items yet. Uninstall/data clearing loses them.
 
-Normal sessions can be ended early after confirmation. Strict sessions reject early stop and reconfiguration until expiry. Accessibility detects package names and shows a timed accessibility overlay. No internet permission, analytics SDK, ads or screen-content retrieval.
+## Build
+JDK17, Gradle8.7, AGP8.6.1, SDK35, minSdk26, targetSdk35. `gradle assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug`.
+Only the main APK is for installation. Smoke and instrumentation APKs are test tools.
 
-## Build and verification
+## Permissions and limits
+Accessibility reads foreground package names, not screen contents. No INTERNET permission, ads, accounts or analytics. Foreground media playback and optional notification permission support audible BGM; a playback notification is shown as Android allows.
+Grant accessibility; if Android restricts it, use Settings > Apps > FocusLock app info > More > Allow restricted settings. OEM labels vary.
+Strict mode controls in-app edits, not system revocation, uninstall, force-stop, safe mode or clock changes. PiP, multi-window, notification shade and manufacturer battery policies need physical-device checks. Background media from other apps is not blocked. Existing debug keys differ; reinstall may be necessary and clears data. No Play Store release.
 
-JDK 17, Gradle 8.7, AGP 8.6.1, Android SDK 35. Run `gradle assembleDebug :app:assembleDebugAndroidTest :app:testDebugUnitTest :app:lintDebug`.
-
-GitHub Actions builds the APK, runs nine unit tests and Android lint, then installs it on an API 35 emulator. The smoke script runs 11 instrumentation checks and verifies that an accessibility overlay appears for a separate test app and disappears after expiry. It captures actual screens and diagnostics. See [latest validation run](https://github.com/mgp185/focusing/actions/runs/36738796170). Physical Galaxy-device testing remains necessary.
-
-APK and reports are available as Actions artifacts. The `smoke` module and instrumentation APK are test tools; install only the main app APK for personal use.
-
-## Install
-
-The debug signing key differs from the previous 1.1 build: uninstall the old app, then install the new APK. Settings are cleared on uninstall. CI debug keys are ephemeral, so future debug builds may also require reinstalling.
-
-Grant FocusLock Accessibility access. If restricted, open Settings > Apps > FocusLock app info > More > Allow restricted settings, then enable the installed accessibility service. Menu labels vary by OS/OEM. Start with one selected app and a one-minute ordinary session, then a one-minute strict session.
-
-## Limits
-
-Strict mode restricts in-app changes. It does not prevent system permission revocation, uninstall, force-stop, safe mode or reboot followed by clock changes. Multi-window, PiP, notification paths and OEM power management require device checks. Background playback is not stopped. Daily usage quotas, recurring schedules and focus statistics are not implemented.
-
-This is a personal test build, not a Play Store release.
+## Validation
+See VALIDATION.md for current verified evidence. Physical Galaxy S23 testing is still necessary.

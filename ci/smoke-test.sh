@@ -5,7 +5,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 adb install -r smoke/build/outputs/apk/debug/smoke-debug.apk
 adb shell am instrument -w com.example.focuslock.test/com.example.focuslock.FlowTests | tee smoke-output/instrumentation.txt
-python3 -c "from pathlib import Path; assert 'PASS 11 checks' in Path('smoke-output/instrumentation.txt').read_text()"
+python3 -c "from pathlib import Path; assert 'PASS 26 checks' in Path('smoke-output/instrumentation.txt').read_text()"
 adb shell am start -n com.example.focuslock/.MainActivity
 sleep 3
 adb exec-out screencap -p > smoke-output/home.png
