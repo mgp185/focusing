@@ -20,7 +20,7 @@ public class AppWatchService extends AccessibilityService {
   if(!FocusState.focusActive(AppWatchService.this))stopService(new Intent(AppWatchService.this,CalmMusicService.class));
   update();handler.postDelayed(this,1000);
  }};
- @Override protected void onServiceConnected(){super.onServiceConnected();connected=true;calls.add("com.android.phone");calls.add("com.android.server.telecom");android.telecom.TelecomManager tm=(android.telecom.TelecomManager)getSystemService(TELECOM_SERVICE);if(tm!=null&&tm.getDefaultDialerPackage()!=null)calls.add(tm.getDefaultDialerPackage());
+ @Override protected void onServiceConnected(){super.onServiceConnected();connected=true;calls.add("com.android.phone");calls.add("com.android.incallui");calls.add("com.android.emergency");calls.add("com.samsung.android.incallui");calls.add("com.samsung.android.app.telephonyui");calls.add("com.android.server.telecom");android.telecom.TelecomManager tm=(android.telecom.TelecomManager)getSystemService(TELECOM_SERVICE);if(tm!=null&&tm.getDefaultDialerPackage()!=null)calls.add(tm.getDefaultDialerPackage());
   if(FocusState.p(this).getLong("focus_end",0)>0)FocusState.cancel(this,"접근성 서비스가 다시 연결되어 집중 보상이 취소됐어요.");
   lastWall=System.currentTimeMillis();lastElapsed=SystemClock.elapsedRealtime();previous=FocusState.schedules(this);handler.post(tick);
  }
@@ -37,7 +37,7 @@ public class AppWatchService extends AccessibilityService {
   if(focus){button("집중 화면 · BGM 설정",()->{foreground=getPackageName();remove();Intent i=new Intent(this,MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);startActivity(i);});button("이번 집중 포기하기",this::confirmQuit);}else button("홈으로 돌아가서 집중하기",()->{performGlobalAction(GLOBAL_ACTION_HOME);remove();});
   WindowManager.LayoutParams params=new WindowManager.LayoutParams(-1,-1,WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,android.graphics.PixelFormat.OPAQUE);((WindowManager)getSystemService(WINDOW_SERVICE)).addView(overlay,params);
  }
- private void confirmQuit(){if(!FocusState.focusActive(this))return;confirming=true;overlay.removeAllViews();countdown=label(FocusState.quitMessage(this),23,Color.parseColor(FocusState.p(this).getBoolean("dark",true)?"#F1F5FC":"#182235"));button("예, 종료할게요",()->{FocusState.cancel(this,"중도 종료 · 이번 집중 보상 0코인");stopService(new Intent(this,CalmMusicService.class));remove();update();});button("아니오, 계속할게요",()->{remove();update();});}
+ private void confirmQuit(){if(!FocusState.focusActive(this))return;confirming=true;overlay.removeAllViews();countdown=label(FocusState.quitMessage(this),23,Color.parseColor(FocusState.p(this).getBoolean("dark",true)?"#F1F5FC":"#182235"));button("예, 종료할게요",()->{FocusState.abandon(this);stopService(new Intent(this,CalmMusicService.class));remove();update();});button("아니오, 계속할게요",()->{remove();update();});}
  private void remove(){if(overlay!=null){((WindowManager)getSystemService(WINDOW_SERVICE)).removeView(overlay);overlay=null;countdown=null;confirming=false;}}
  @Override public void onInterrupt(){FocusState.cancel(this,"접근성이 중단되어 집중 보상이 취소됐어요.");stopService(new Intent(this,CalmMusicService.class));remove();}
  @Override public void onDestroy(){connected=false;handler.removeCallbacks(tick);if(FocusState.p(this).getLong("focus_end",0)>0)FocusState.cancel(this,"접근성이 종료되어 집중 보상이 취소됐어요.");stopService(new Intent(this,CalmMusicService.class));remove();super.onDestroy();}

@@ -13,6 +13,7 @@ final class FocusState {
  static synchronized void settle(Context c){SharedPreferences p=p(c);long end=p.getLong("focus_end",0);if(end==0)return;if(p.getInt("focus_boot",-2)!=LockPrefs.boot(c)){cancel(c,"재부팅으로 집중이 종료되어 보상이 취소됐어요.");return;}if(SystemClock.elapsedRealtime()>=end){long total=p.getLong("focus_completed_ms",0)+p.getLong("focus_duration",0);long gained=RewardRules.focusCoins(total)-RewardRules.focusCoins(p.getLong("focus_completed_ms",0));p.edit().putLong("focus_completed_ms",total).putLong("focus_end",0).putString("focus_result","집중 완료! +"+gained+"코인").commit();}}
  static boolean focusActive(Context c){return p(c).getInt("focus_boot",-2)==LockPrefs.boot(c)&&p(c).getLong("focus_end",0)>SystemClock.elapsedRealtime();}
  static long remaining(Context c){return focusActive(c)?p(c).getLong("focus_end",0)-SystemClock.elapsedRealtime():0;}
+ static synchronized void abandon(Context c){settle(c);if(focusActive(c))cancel(c,"중도 종료 · 이번 집중 보상 0코인");}
  static synchronized void cancel(Context c,String reason){p(c).edit().putLong("focus_end",0).putString("focus_result",reason).commit();}
  static long coins(Context c){SharedPreferences p=p(c);return RewardRules.automaticCoins(p.getLong("auto_ms",0))+RewardRules.focusCoins(p.getLong("focus_completed_ms",0));}
  static synchronized void creditAutomatic(Context c,long ms){if(ms>0)p(c).edit().putLong("auto_ms",p(c).getLong("auto_ms",0)+ms).commit();}
