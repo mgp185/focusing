@@ -32,7 +32,7 @@ echo 'PASS: real accessibility overlay appeared and expired' | tee smoke-output/
 
 adb shell am instrument -w -e mode live com.example.focuslock.test/com.example.focuslock.FlowTests | tee smoke-output/live-tests.txt
 python3 -c "from pathlib import Path; assert 'PASS LIVE' in Path('smoke-output/live-tests.txt').read_text()"
-for image in focus-ready focus-running focus-blocked quit-confirmation scheduled-blocked schedules schedule-editor shop; do
+for image in focus-ready focus-running focus-blocked quit-confirmation focus-expired scheduled-blocked schedules schedule-editor schedule-saved shop; do
   adb exec-out run-as com.example.focuslock cat files/$image.png > smoke-output/$image.png
 done
 adb logcat -d -s AndroidRuntime > smoke-output/final-runtime-log.txt
